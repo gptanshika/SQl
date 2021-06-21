@@ -1,5 +1,15 @@
+-- Import csv file to mysql by using command : 
+-- LOAD DATA INFILE "C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/data.csv" 
+-- INTO TABLE nashville 
+-- FIELDS TERMINATED BY ',' 
+-- ENCLOSED BY '"' 
+-- LINES TERMINATED BY '\n' 
+-- IGNORE 1 LINES;
+
+-- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 use data_analytics;
--- ---------------------------------------------------Change SalesDate into DateTime ---------------------------------------------------------------------------------
+-- ---------------------------------------------------Change SalesDate into DateTime --------------------------------------------------------------------------------------------
 #change the dalesDate datatype varchar to datetime
 select SalesDate ,str_to_Date(SalesDate,'%M %d,%Y')
 from nashville;
@@ -8,7 +18,7 @@ from nashville;
 update  nashville
 set SalesDate=str_to_Date(SalesDate,'%M %d,%Y');
 
--- ----------------------------------------------Fill the null address by same parcelid -------------------------------------------------------------------------------- 
+-- ----------------------------------------------Fill the null address by same parcelid ------------------------------------------------------------------------------------------ 
 select propertyAddress,UniqueID
 from nashville
 where propertyAddress= '0';
@@ -29,7 +39,7 @@ on a.ParcelID=b.ParcelID
 set a.propertyAddress=ifnull(a.propertyAddress,b.propertyAddress)
 where a.propertyAddress is Null AND a.UniqueID<>b.UniqueID;
 
--- --------------------------------------------------Spliting the PropertyAddresss----------------------------------------------------------------------------
+-- --------------------------------------------------Spliting the PropertyAddresss-----------------------------------------------------------------------------------------------
 select propertyAddress,
 	   substring(propertyAddress,1,position("," in propertyAddress)-1) as Addess,
 	   substring(propertyAddress,position("," in propertyAddress)+1) as city
@@ -43,7 +53,7 @@ update nashville
 set Address=substring(propertyAddress,1,position("," in propertyAddress)-1),
 	city=substring(propertyAddress,position("," in propertyAddress)+1) ;
 
--- ------------------------------------------------Spliting the ownerAddress-----------------------------------------------------------------------------    
+-- ------------------------------------------------Spliting the ownerAddress-----------------------------------------------------------------------------------------------------    
 select OwnerAddress,substring_index(OwnerAddress,',',1) as owneraddress,
 		substring_index(substring_index(OwnerAddress,',',2),',',-1) as ownercity,
         substring_index(OwnerAddress,',',-1) as ownerstate
